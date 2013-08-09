@@ -14,7 +14,7 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
-    NSString *path = [NSHomeDirectory() stringByAppendingPathComponent:@"Pictures/flickr"];
+    NSString *path = [NSHomeDirectory() stringByAppendingPathComponent:@"Pictures/flickr_test"];
     
     flickrContext = [[OFFlickrAPIContext alloc] initWithAPIKey:OBJECTIVE_FLICKR_SAMPLE_API_KEY sharedSecret:OBJECTIVE_FLICKR_SAMPLE_API_SHARED_SECRET];
     flickrRequest = [[OFFlickrAPIRequest alloc] initWithAPIContext:flickrContext];
@@ -33,6 +33,16 @@
     NSLog(@"Finished Launching.");
     [self.statusLabel setStringValue:@"Starting..."];
     [self.statusLabel display];
+    
+    [self.progress setMinValue:0.0];
+    [self.progress setMaxValue:0.0];
+    [self.progress setDoubleValue:0.0];
+    
+    self.totalCount = 0;
+    self.currentCount = 0;
+    
+    self.waitForStart = [[NSCondition alloc] init];
+    self.waitForUploadComplete = [[NSCondition alloc] init];
 }
 
 - (void)registerUrlScheme
@@ -42,35 +52,31 @@
 }
 - (void)authFromWeb
 {
-    
     NSURL *url = [[NSURL alloc] initWithString:@"flickruploadr://callback"];
-    [flickrRequest fetchOAuthRequestTokenWithCallbackURL:url];
-    
-    
-    NSLog(@"Launched Flickr auth URL %@\n", [url absoluteString]);
+
+    NSLog(@"Launching Flickr auth URL %@\n", [url absoluteString]);
     [self.statusLabel setStringValue:@"Starting Flickr auth..."];
     [self.statusLabel display];
+    
+    [flickrRequest fetchOAuthRequestTokenWithCallbackURL:url];
 }
-
 
 - (void)getUrl:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent
 {
-    NSURL *callbackURL = [NSURL URLWithString:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
-    NSLog(@"Callback URL: %@", [callbackURL absoluteString]);
-    
     NSString *requestToken= nil;
     NSString *verifier = nil;
+    
+    NSURL *callbackURL = [NSURL URLWithString:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
+    NSLog(@"Callback URL: %@", [callbackURL absoluteString]);
     
     BOOL result = OFExtractOAuthCallback(callbackURL, [NSURL URLWithString:@"flickruploadr://callback"], &requestToken, &verifier);
     if (!result) {
         NSLog(@"Invalid callback URL");
+    } else {
+        [flickrRequest fetchOAuthAccessTokenWithRequestToken:requestToken verifier:verifier];
+        [self.statusLabel setStringValue:@"Got user response..."];
+        [self.statusLabel display];
     }
-    
-    [flickrRequest fetchOAuthAccessTokenWithRequestToken:requestToken verifier:verifier];
-    [self.statusLabel setStringValue:@"Got user response..."];
-    [self.statusLabel display];
-
-    
 }
 
 - (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest didObtainOAuthRequestToken:(NSString *)inRequestToken secret:(NSString *)inSecret
@@ -97,15 +103,32 @@
     [NSThread detachNewThreadSelector:@selector(startWorker) toTarget:self withObject:nil];
 }
 
+- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest didFailWithError:(NSError *)inError
+{
+    [self.statusLabel setStringValue:@"Error detected...."];
+    
+    NSAttributedString * attrString = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", [inError localizedDescription]]];
+    [[self.activity textStorage] performSelectorOnMainThread:@selector(appendAttributedString:) withObject:attrString waitUntilDone:YES];
+    [self performSelectorOnMainThread:@selector(scrollToBottom) withObject:self waitUntilDone:YES];
+
+}
+
 - (void)startWorker
 {
     self.totalCount = [self.scanner buildFileList];
     
     NSString *str = [NSString stringWithFormat:@"Uploading %lu files...", (unsigned long)self.totalCount];
-    
     [self.statusLabel setStringValue:str];
     [self.statusLabel display];
-    
+    [self.progress setMaxValue:self.totalCount];
+    [self.startButton setEnabled:YES];
+
+    NSLog(@"Waiting for start...");
+    [self.waitForStart lock];
+    [self.waitForStart wait];
+    [self.waitForStart unlock];
+    NSLog(@"Got start signal.");
+
     [self.scanner startUploadingTo:self];
     
 }
@@ -129,16 +152,55 @@
 
 - (void)upload:(NSString *)fileName FromPath:(NSString *)fromPath ToSet:(NSString *)setName
 {
-    
+    self.currentCount++;
     
     NSAttributedString * attrString = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"file:%@ path:%@ set:%@\n", fileName, fromPath, setName]];
-    
     [[self.activity textStorage] performSelectorOnMainThread:@selector(appendAttributedString:) withObject:attrString waitUntilDone:YES];
     [self performSelectorOnMainThread:@selector(scrollToBottom) withObject:self waitUntilDone:YES];
+
+    [self.statusLabel setStringValue:[NSString stringWithFormat:@"Uploading %lu of %lu files...", (unsigned long)self.currentCount, (unsigned long)self.totalCount]];
+    [self.progress setDoubleValue:self.currentCount];
     
+    NSString *ext = [fileName pathExtension];
+    NSString *mimeType = @"";
+
+    NSString *fullPath = [fromPath stringByAppendingFormat:@"/%@", fileName];
+    NSInputStream *inputStream = [NSInputStream inputStreamWithFileAtPath:fullPath];
+
+    if([ext isCaseInsensitiveLike:@"jpg"]) {
+        mimeType = @"image/jpeg";
+    }
+    else if([ext isCaseInsensitiveLike:@"png"]) {
+        mimeType = @"image/png";
+    }
     
-    NSLog(@"File=%@ Path=%@ Set=%@\n", fileName, fromPath, setName);
+
+    bool result = [flickrRequest uploadImageStream:inputStream suggestedFilename:fileName MIMEType:mimeType arguments:@{}];
+    NSLog(@"Sent request result=%d FullPath=%@ Set=%@ mimeType=%@\n", result, fullPath, setName, mimeType);
+    [self.waitForUploadComplete lock];
+    [self.waitForUploadComplete wait];
+    [self.waitForUploadComplete unlock];
 
 }
 
+- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest imageUploadSentBytes:(NSUInteger)inSentBytes totalBytes:(NSUInteger)inTotalBytes
+{
+    NSLog(@"Upload successful... inSentBytes:%lu inTotalBytes:%lu", inSentBytes, inTotalBytes);
+    [self.waitForUploadComplete lock];
+    [self.waitForUploadComplete signal];
+    [self.waitForUploadComplete unlock];
+}
+
+- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest didCompleteWithResponse:(NSDictionary *)inResponseDictionary
+{
+    NSLog(@"Successful");
+}
+
+- (IBAction)start:(id)sender {
+    NSLog(@"Signalling start...");
+    [self.waitForStart lock];
+    [self.waitForStart signal];
+    [sender setEnabled:NO];
+    [self.waitForStart unlock];
+}
 @end

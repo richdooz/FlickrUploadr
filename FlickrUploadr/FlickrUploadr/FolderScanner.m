@@ -53,6 +53,7 @@
                 NSLog(@"Folder \"%@\"\n", file);
             }
             else {
+                NSLog(@"File \"%@\"\n", file);
                 fileInstance.name = [file lastPathComponent];
                 fileInstance.path = [file stringByDeletingLastPathComponent];
                 fileInstance.set = [[file stringByDeletingLastPathComponent] stringByReplacingOccurrencesOfString:@"/" withString:@" "];
@@ -60,6 +61,7 @@
             }
         }
     }
+    NSLog(@"Done building file list.\n");
     return [self.fileArray count];
 }
 
