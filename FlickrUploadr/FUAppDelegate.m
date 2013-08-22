@@ -22,9 +22,16 @@
     flickrRequest.delegate = self;
     
     self.scanner = [[FolderScanner alloc] initWithStartingDirectory:path];
+
     
-    [self registerUrlScheme];
-    [self authFromWeb];
+    [flickrContext setOAuthToken:@"72157633799659695-18fa2dbedef388a3"];
+    [flickrContext setOAuthTokenSecret:@"b6e62b4e58a1e88e"];
+    [self.statusLabel setStringValue:@"Authorized"];
+    [self.statusLabel display];
+    [NSThread detachNewThreadSelector:@selector(startWorker) toTarget:self withObject:nil];
+
+    //[self registerUrlScheme];
+    //[self authFromWeb];
     
     NSLog(@"Current=%@\n", [self.scanner current]);
     
@@ -97,6 +104,9 @@
     [flickrContext setOAuthTokenSecret:inSecret];
     
     NSLog(@"User authorization successful!  Got Access token!\n");
+    NSLog(@"Access Token: %@", inAccessToken);
+    NSLog(@"Secret: %@", inSecret);
+    
     [self.statusLabel setStringValue:@"Authorized"];
     [self.statusLabel display];
     
@@ -180,6 +190,7 @@
     [self.waitForUploadComplete lock];
     [self.waitForUploadComplete wait];
     [self.waitForUploadComplete unlock];
+    NSLog(@"Sent request result=%d FullPath=%@ Set=%@ mimeType=%@\n", result, fullPath, setName, mimeType);
 
 }
 
