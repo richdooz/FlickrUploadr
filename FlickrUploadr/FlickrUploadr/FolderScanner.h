@@ -20,7 +20,11 @@
 @property (nonatomic, assign) NSString *name;
 @property (nonatomic, assign) NSString *path;
 @property (nonatomic, assign) NSString *set;
+
 @end
+
+
+
 
 @interface FolderScanner : NSObject
 {

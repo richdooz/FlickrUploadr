@@ -56,7 +56,10 @@
                 NSLog(@"File \"%@\"\n", file);
                 fileInstance.name = [file lastPathComponent];
                 fileInstance.path = [file stringByDeletingLastPathComponent];
-                fileInstance.set = [[file stringByDeletingLastPathComponent] stringByReplacingOccurrencesOfString:@"/" withString:@" "];
+                fileInstance.set =
+                [[file stringByDeletingLastPathComponent] stringByReplacingOccurrencesOfString:@"/"
+                                                                                    withString:@" "
+                 ];
                 [self.fileArray addObject:fileInstance];
             }
         }

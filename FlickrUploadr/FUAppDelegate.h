@@ -31,10 +31,19 @@
 
 
 - (void)getUrl:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
-- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest didObtainOAuthRequestToken:(NSString *)inRequestToken secret:(NSString *)inSecret;
-- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest didObtainOAuthAccessToken:(NSString *)inAccessToken secret:(NSString *)inSecret userFullName:(NSString *)inFullName userName:(NSString *)inUserName userNSID:(NSString *)inNSID;
+-   (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest
+didObtainOAuthRequestToken:(NSString *)inRequestToken
+                    secret:(NSString *)inSecret;
+-   (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest
+ didObtainOAuthAccessToken:(NSString *)inAccessToken
+                    secret:(NSString *)inSecret
+              userFullName:(NSString *)inFullName
+                  userName:(NSString *)inUserName
+                  userNSID:(NSString *)inNSID;
 - (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest didFailWithError:(NSError *)inError;
-- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest imageUploadSentBytes:(NSUInteger)inSentBytes totalBytes:(NSUInteger)inTotalBytes;
+- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest
+    imageUploadSentBytes:(NSUInteger)inSentBytes
+              totalBytes:(NSUInteger)inTotalBytes;
 
 @property (assign) IBOutlet NSWindow *window;
 @property (unsafe_unretained) IBOutlet NSTextView *activity;
