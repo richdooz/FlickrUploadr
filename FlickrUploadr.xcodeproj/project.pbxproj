@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9B4BEFE7181B5B6C0070A098 /* Flickr.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B4BEFE5181B5B6C0070A098 /* Flickr.m */; };
 		9B653E121756F3E00089EDED /* ObjectiveFlickr.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B653E0B1756D6600089EDED /* ObjectiveFlickr.framework */; };
 		9BAFBE891756D5B8002E3BA0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BAFBE881756D5B8002E3BA0 /* Cocoa.framework */; };
 		9BAFBE931756D5B8002E3BA0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9BAFBE911756D5B8002E3BA0 /* InfoPlist.strings */; };
@@ -42,6 +43,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9B4BEFE5181B5B6C0070A098 /* Flickr.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Flickr.m; sourceTree = "<group>"; };
+		9B4BEFE6181B5B6C0070A098 /* Flickr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Flickr.h; sourceTree = "<group>"; };
 		9B653E041756D6600089EDED /* ObjectiveFlickr.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectiveFlickr.xcodeproj; path = ../objectiveflickr/ObjectiveFlickr.xcodeproj; sourceTree = "<group>"; };
 		9B653E101756E47A0089EDED /* SampleAPIKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SampleAPIKey.h; path = ../objectiveflickr/SampleAPIKey.h; sourceTree = "<group>"; };
 		9BAFBE851756D5B8002E3BA0 /* FlickrUploadr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlickrUploadr.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -148,6 +151,8 @@
 		9BAFBEA51756D60E002E3BA0 /* FlickrUploadr */ = {
 			isa = PBXGroup;
 			children = (
+				9B4BEFE5181B5B6C0070A098 /* Flickr.m */,
+				9B4BEFE6181B5B6C0070A098 /* Flickr.h */,
 				9BAFBEA91756D60E002E3BA0 /* FolderScanner.h */,
 				9BAFBEAA1756D60E002E3BA0 /* FolderScanner.m */,
 			);
@@ -245,6 +250,7 @@
 			files = (
 				9BAFBE951756D5B8002E3BA0 /* main.m in Sources */,
 				9BAFBE9C1756D5B8002E3BA0 /* FUAppDelegate.m in Sources */,
+				9B4BEFE7181B5B6C0070A098 /* Flickr.m in Sources */,
 				9BAFBEAF1756D60E002E3BA0 /* FolderScanner.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
