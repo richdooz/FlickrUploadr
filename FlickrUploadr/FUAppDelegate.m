@@ -15,17 +15,20 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
     NSString *path = [NSHomeDirectory() stringByAppendingPathComponent:@"Pictures/flickr_test"];
+
     
-    flickrContext = [[OFFlickrAPIContext alloc]
-                     initWithAPIKey:OBJECTIVE_FLICKR_SAMPLE_API_KEY
-                     sharedSecret:OBJECTIVE_FLICKR_SAMPLE_API_SHARED_SECRET];
-    flickrRequest = [[OFFlickrAPIRequest alloc]
-                     initWithAPIContext:flickrContext];
-    
-    flickrRequest.delegate = self;
-    
-    [flickrContext setOAuthToken:@"72157633799659695-18fa2dbedef388a3"];
-    [flickrContext setOAuthTokenSecret:@"b6e62b4e58a1e88e"];
+    flickr = [[FUFlickr alloc] init];
+//    flickrContext = [[OFFlickrAPIContext alloc]
+//                     initWithAPIKey:OBJECTIVE_FLICKR_SAMPLE_API_KEY
+//                     sharedSecret:OBJECTIVE_FLICKR_SAMPLE_API_SHARED_SECRET];
+//    flickrRequest = [[OFFlickrAPIRequest alloc]
+//                     initWithAPIContext:flickrContext];
+//    
+//    flickrRequest.delegate = self;
+
+    // TODO: Hard coded... should store in property list maybe?  Is a property list secure enough?
+//    [flickrContext setOAuthToken:@"72157633799659695-18fa2dbedef388a3"];
+//    [flickrContext setOAuthTokenSecret:@"b6e62b4e58a1e88e"];
 
     self.scanner = [[FolderScanner alloc] initWithStartingDirectory:path];
 
@@ -37,7 +40,7 @@
     //[self registerUrlScheme];
     //[self authFromWeb];
     
-    NSLog(@"Current=%@\n", [self.scanner current]);
+//    NSLog(@"Current=%@\n", [self.scanner current]);
     
     //[scanner startUploadingTo:app];
     

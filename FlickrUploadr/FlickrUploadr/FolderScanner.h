@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "FlickrUploadr.h"
+#import "FUFileSet.h"
 
 @protocol UploaderDelegate <NSObject>
 
@@ -15,29 +16,25 @@
 
 @end
 
-@interface FileInstance : NSObject
-
-@property (nonatomic, assign) NSString *name;
-@property (nonatomic, assign) NSString *path;
-@property (nonatomic, assign) NSString *set;
-
-@end
-
-
 
 
 @interface FolderScanner : NSObject
-{
-    NSFileManager *mgr;
-    NSDirectoryEnumerator *enumerator;
-}
-@property (nonatomic, strong) NSMutableArray *fileArray;
+
+@property (weak)  NSDirectoryEnumerator *enumerator;
+@property (nonatomic, strong) FUFileSet *fileSet;
 
 - (id)init;
 - (id)initWithStartingDirectory:(NSString *)start;
-- (NSString *)current;
+- (id)initWithEnumerator:(NSDirectoryEnumerator *)enumerator;
+
 - (NSUInteger)buildFileList;
+
 - (void)startUploadingTo:(NSObject<UploaderDelegate> *)uploader;
+
+//- (NSString *)getNameFromFile:(NSString *)file;
+//- (NSString *)getPathFromFile:(NSString *)file;
+//- (NSString *)getSetNameFromFile:(NSString *)file;
+
 
 
 @end

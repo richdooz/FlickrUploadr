@@ -8,10 +8,12 @@
 
 #import <Cocoa/Cocoa.h>
 #import "FolderScanner.h"
+#import "Flickr.h"
 #import "ObjectiveFlickr/ObjectiveFlickr.h"
 
 @interface FUAppDelegate : NSObject <NSApplicationDelegate, OFFlickrAPIRequestDelegate, UploaderDelegate>
 {
+    FUFlickr *flickr;
     
     OFFlickrAPIContext *flickrContext;
     OFFlickrAPIRequest *flickrRequest;

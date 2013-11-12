@@ -6,22 +6,21 @@
 //  Copyright (c) 2013 Richard Duszczak. All rights reserved.
 //
 
+#import "FUFileSet.h"
 #import "FolderScanner.h"
+#import <Foundation/NSString.h>
+#import <Foundation/NSCharacterSet.h>
 
-@implementation FileInstance
 
-
-
-@end
 
 @implementation FolderScanner
 
 - (id)init
 {
     self = [super init];
-    mgr = [[NSFileManager alloc] init];
-    enumerator = [mgr enumeratorAtPath:@"."];
-    self.fileArray = [[NSMutableArray alloc] init];
+
+    self.enumerator = [[[NSFileManager alloc] init] enumeratorAtPath:@"."];
+    self.fileSet = [[FUFileSet alloc] init];
     
     return self;
 }
@@ -29,52 +28,52 @@
 - (id)initWithStartingDirectory:(NSString *)start
 {
     self = [super init];
-    mgr = [[NSFileManager alloc] init];
-    enumerator = [mgr enumeratorAtPath:start];
-    self.fileArray = [[NSMutableArray alloc] init];
+    
+    self.enumerator = [[[NSFileManager alloc] init] enumeratorAtPath:start];
+    self.fileSet = [[FUFileSet alloc] init];
     
     return self;
 }
 
-- (NSString *)current
+- (id)initWithEnumerator:(NSDirectoryEnumerator *)enumerator;
 {
-    return [mgr currentDirectoryPath];
+    self = [super init];
+    
+    self.enumerator = enumerator;
+    self.fileSet = [[FUFileSet alloc] init];
+    
+    return self;
 }
 
 - (NSUInteger)buildFileList
 {
     NSString *file;
-    while ((file = [enumerator nextObject])) {
+    while ((file = [self.enumerator nextObject])) {
         if([file hasPrefix:@"2"]) {
-            FileInstance *fileInstance = [[FileInstance alloc] init];
-            NSDictionary *attrs = [enumerator fileAttributes];
+            FUFileInstance *fileInstance = [[FUFileInstance alloc] initWithFile:file];
+            NSDictionary *attrs = [self.enumerator fileAttributes];
             
             if([[attrs objectForKey:NSFileType] isEqualToString:NSFileTypeDirectory]) {
                 NSLog(@"Folder \"%@\"\n", file);
-            }
-            else {
+            } else {
                 NSLog(@"File \"%@\"\n", file);
-                fileInstance.name = [file lastPathComponent];
-                fileInstance.path = [file stringByDeletingLastPathComponent];
-                fileInstance.set =
-                [[file stringByDeletingLastPathComponent] stringByReplacingOccurrencesOfString:@"/"
-                                                                                    withString:@" "
-                 ];
-                [self.fileArray addObject:fileInstance];
+                [self.fileSet add:fileInstance];
             }
         }
     }
     NSLog(@"Done building file list.\n");
-    return [self.fileArray count];
+    return [self.fileSet count];
 }
 
 - (void)startUploadingTo:(NSObject<UploaderDelegate> *)uploader
 {
-    [self.fileArray enumerateObjectsUsingBlock:^(FileInstance *obj, NSUInteger idx, BOOL *stop) {
-        
-        [uploader upload:[obj name] FromPath:[obj path] ToSet:[obj set]];
-    }];
+//    [self.fileArray enumerateObjectsUsingBlock:^(FileInstance *obj, NSUInteger idx, BOOL *stop) {
+//        
+//        [uploader upload:[obj name] FromPath:[obj path] ToSet:[obj set]];
+//    }];
 }
+
+
 
 
 @end
