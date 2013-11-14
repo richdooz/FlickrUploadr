@@ -17,28 +17,18 @@
     NSString *path = [NSHomeDirectory() stringByAppendingPathComponent:@"Pictures/flickr_test"];
 
     
-    flickr = [[FUFlickr alloc] init];
-//    flickrContext = [[OFFlickrAPIContext alloc]
-//                     initWithAPIKey:OBJECTIVE_FLICKR_SAMPLE_API_KEY
-//                     sharedSecret:OBJECTIVE_FLICKR_SAMPLE_API_SHARED_SECRET];
-//    flickrRequest = [[OFFlickrAPIRequest alloc]
-//                     initWithAPIContext:flickrContext];
-//    
-//    flickrRequest.delegate = self;
-
-    // TODO: Hard coded... should store in property list maybe?  Is a property list secure enough?
-//    [flickrContext setOAuthToken:@"72157633799659695-18fa2dbedef388a3"];
-//    [flickrContext setOAuthTokenSecret:@"b6e62b4e58a1e88e"];
-
+    self.flickr = [[FUFlickr alloc] init];
     self.scanner = [[FolderScanner alloc] initWithStartingDirectory:path];
-
     
     [self.statusLabel setStringValue:@"Authorized"];
     [self.statusLabel display];
     [NSThread detachNewThreadSelector:@selector(startWorker) toTarget:self withObject:nil];
 
-    //[self registerUrlScheme];
-    //[self authFromWeb];
+    [self registerUrlScheme];
+
+    [self authFromWeb];
+    [self.statusLabel setStringValue:@"Starting Flickr auth..."];
+    [self.statusLabel display];
     
 //    NSLog(@"Current=%@\n", [self.scanner current]);
     
@@ -66,89 +56,10 @@
                                                        andSelector:@selector(getUrl:withReplyEvent:)
                                                      forEventClass:kInternetEventClass andEventID:kAEGetURL];
 }
+
 - (void)authFromWeb
 {
-    NSURL *url = [[NSURL alloc] initWithString:@"flickruploadr://callback"];
-
-    NSLog(@"Launching Flickr auth URL %@\n", [url absoluteString]);
-    [self.statusLabel setStringValue:@"Starting Flickr auth..."];
-    [self.statusLabel display];
-    
-    [flickrRequest fetchOAuthRequestTokenWithCallbackURL:url];
-}
-
-- (void)getUrl:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent
-{
-    NSString *requestToken= nil;
-    NSString *verifier = nil;
-    
-    NSURL *callbackURL = [NSURL URLWithString:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
-    NSLog(@"Callback URL: %@", [callbackURL absoluteString]);
-    
-    BOOL result = OFExtractOAuthCallback(
-                                         callbackURL,
-                                         [NSURL URLWithString:@"flickruploadr://callback"],
-                                         &requestToken,
-                                         &verifier
-                                         );
-    if (!result) {
-        NSLog(@"Invalid callback URL");
-    } else {
-        [flickrRequest fetchOAuthAccessTokenWithRequestToken:requestToken verifier:verifier];
-        [self.statusLabel setStringValue:@"Got user response..."];
-        [self.statusLabel display];
-    }
-}
-
-- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest
-didObtainOAuthRequestToken:(NSString *)inRequestToken
-                  secret:(NSString *)inSecret
-{
-    [flickrContext setOAuthToken:inRequestToken];
-    [flickrContext setOAuthTokenSecret:inSecret];
-    
-    NSLog(@"Got Request token, waiting for user authorization...\n");
-    NSURL *url = [flickrContext userAuthorizationURLWithRequestToken:inRequestToken
-                                                 requestedPermission:OFFlickrWritePermission
-                  ];
-    
-    BOOL result = [[NSWorkspace sharedWorkspace] openURL:url];
-    
-    NSLog(@"openURL result=%d", result);
-}
-- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest
-didObtainOAuthAccessToken:(NSString *)inAccessToken
-                  secret:(NSString *)inSecret
-            userFullName:(NSString *)inFullName
-                userName:(NSString *)inUserName
-                userNSID:(NSString *)inNSID
-{
-    [flickrContext setOAuthToken:inAccessToken];
-    [flickrContext setOAuthTokenSecret:inSecret];
-    
-    NSLog(@"User authorization successful!  Got Access token!\n");
-    NSLog(@"Access Token: %@", inAccessToken);
-    NSLog(@"Secret: %@", inSecret);
-    
-    [self.statusLabel setStringValue:@"Authorized"];
-    [self.statusLabel display];
-    
-    [NSThread detachNewThreadSelector:@selector(startWorker) toTarget:self withObject:nil];
-}
-
-- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest
-        didFailWithError:(NSError *)inError
-{
-    NSLog(@"Error detected...\n");
-    [self.statusLabel setStringValue:@"Error detected...."];
-    
-    NSAttributedString * attrString = [[NSAttributedString
-                                        alloc] initWithString:[NSString stringWithFormat:@"%@\n",
-                                                               [inError localizedDescription]]
-                                       ];
-    [[self.activity textStorage] performSelectorOnMainThread:@selector(appendAttributedString:)
-                                                  withObject:attrString waitUntilDone:YES];
-    [self performSelectorOnMainThread:@selector(scrollToBottom) withObject:self waitUntilDone:YES];
+    [self.flickr authFromWeb];
 }
 
 - (void)startWorker
@@ -192,6 +103,7 @@ didObtainOAuthAccessToken:(NSString *)inAccessToken
 
 - (void)upload:(NSString *)fileName FromPath:(NSString *)fromPath ToSet:(NSString *)setName
 {
+#if 0
     self.currentCount++;
     
     NSAttributedString * attrString =
@@ -240,26 +152,9 @@ didObtainOAuthAccessToken:(NSString *)inAccessToken
           result, fullPath, setName, mimeType
           );
 
+#endif
 }
 
-- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest
-    imageUploadSentBytes:(NSUInteger)inSentBytes
-              totalBytes:(NSUInteger)inTotalBytes
-{
-    NSLog(@"Upload successful... inSentBytes:%lu inTotalBytes:%lu", inSentBytes, inTotalBytes);
-    [self.waitForUploadComplete lock];
-    [self.waitForUploadComplete signal];
-    [self.waitForUploadComplete unlock];
-}
-
-- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest
- didCompleteWithResponse:(NSDictionary *)inResponseDictionary
-{
-    NSLog(@"Successful");
-    [self.waitForUploadComplete lock];
-    [self.waitForUploadComplete signal];
-    [self.waitForUploadComplete unlock];
-}
 
 - (IBAction)start:(id)sender {
     NSLog(@"Signalling start...");

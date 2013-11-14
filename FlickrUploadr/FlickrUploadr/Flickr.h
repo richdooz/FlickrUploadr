@@ -12,13 +12,20 @@
 
 @interface FUFlickr : NSObject <NSApplicationDelegate, OFFlickrAPIRequestDelegate>
 {
-    
-    OFFlickrAPIContext *flickrContext;
-    OFFlickrAPIRequest *flickrRequest;
+    OFFlickrAPIRequest *request;
 }
 
--(id) init;
+@property (strong) OFFlickrAPIContext *context;
+@property (strong) NSString *status;
+@property BOOL result;
 
+- (id)init;
+- (void)authFromWeb;
+- (void)testCode;
 
 @end
 
+
+@interface FUFileUpload : NSObject
+
+@end
