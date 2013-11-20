@@ -37,28 +37,11 @@
 
 -(void)upload:(NSString *)fileName FromPath:(NSString *)path ToSet:(NSString *)setName;
 -(void)registerUrlScheme;
--(void)authFromWeb;
+-(void)auth;
 
 
 //-(void)                      getUrl:(NSAppleEventDescriptor *)event
 //                     withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
-
--(void)            flickrAPIRequest:(OFFlickrAPIRequest *)inRequest
-         didObtainOAuthRequestToken:(NSString *)inRequestToken
-                             secret:(NSString *)inSecret;
-
--(void)            flickrAPIRequest:(OFFlickrAPIRequest *)inRequest
-          didObtainOAuthAccessToken:(NSString *)inAccessToken
-                             secret:(NSString *)inSecret
-                       userFullName:(NSString *)inFullName
-                           userName:(NSString *)inUserName
-                           userNSID:(NSString *)inNSID;
-
--(void)            flickrAPIRequest:(OFFlickrAPIRequest *)inRequest didFailWithError:(NSError *)inError;
-
--(void)            flickrAPIRequest:(OFFlickrAPIRequest *)inRequest
-               imageUploadSentBytes:(NSUInteger)inSentBytes
-                         totalBytes:(NSUInteger)inTotalBytes;
 
 -(IBAction)                   start:(id)sender;
 

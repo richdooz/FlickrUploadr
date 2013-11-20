@@ -26,7 +26,7 @@
 
     [self registerUrlScheme];
 
-    [self authFromWeb];
+    [self auth];
     [self.statusLabel setStringValue:@"Starting Flickr auth..."];
     [self.statusLabel display];
     
@@ -57,8 +57,9 @@
                                                      forEventClass:kInternetEventClass andEventID:kAEGetURL];
 }
 
-- (void)authFromWeb
+- (void)auth
 {
+//    [self.flickr authWithKnownToken];
     [self.flickr authFromWeb];
 }
 

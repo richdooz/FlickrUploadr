@@ -16,11 +16,12 @@
 }
 
 @property (strong) OFFlickrAPIContext *context;
-@property (strong) NSString *status;
+@property (strong) NSAttributedString *status;
 @property BOOL result;
 
 - (id)init;
 - (void)authFromWeb;
+- (void)authWithKnownToken;
 - (void)testCode;
 
 @end

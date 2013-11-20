@@ -20,6 +20,7 @@
 		9BAFBE9C1756D5B8002E3BA0 /* FUAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BAFBE9B1756D5B8002E3BA0 /* FUAppDelegate.m */; };
 		9BAFBE9F1756D5B8002E3BA0 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9BAFBE9D1756D5B8002E3BA0 /* MainMenu.xib */; };
 		9BAFBEAF1756D60E002E3BA0 /* FolderScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BAFBEAA1756D60E002E3BA0 /* FolderScanner.m */; };
+		9BE78C6518398477000CA482 /* FUAuthTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BE78C6418398477000CA482 /* FUAuthTest.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +82,7 @@
 		9BAFBE9E1756D5B8002E3BA0 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		9BAFBEA91756D60E002E3BA0 /* FolderScanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FolderScanner.h; sourceTree = "<group>"; };
 		9BAFBEAA1756D60E002E3BA0 /* FolderScanner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FolderScanner.m; sourceTree = "<group>"; };
+		9BE78C6418398477000CA482 /* FUAuthTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FUAuthTest.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +109,7 @@
 		9B4BEFF1181B656C0070A098 /* FlickrUploadr Tests */ = {
 			isa = PBXGroup;
 			children = (
+				9BE78C6418398477000CA482 /* FUAuthTest.m */,
 				9B4BEFF7181B656C0070A098 /* FolderScanner_Tests.m */,
 				9B4BEFF2181B656C0070A098 /* Supporting Files */,
 			);
@@ -331,6 +334,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9BE78C6518398477000CA482 /* FUAuthTest.m in Sources */,
 				9B4BEFF8181B656C0070A098 /* FolderScanner_Tests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

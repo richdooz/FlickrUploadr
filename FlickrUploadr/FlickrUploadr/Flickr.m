@@ -26,29 +26,23 @@
 -(id) init
 {
     self = [super init];
-    
     self.context = [[OFFlickrAPIContext alloc] initWithAPIKey:OBJECTIVE_FLICKR_SAMPLE_API_KEY
                                                  sharedSecret:OBJECTIVE_FLICKR_SAMPLE_API_SHARED_SECRET];
     request = [[OFFlickrAPIRequest alloc] initWithAPIContext:self.context];
-    
     request.delegate = self;
-
-#if 1
-    [self.context setOAuthToken:@"72157633799659695-18fa2dbedef388a3"];
-    [self.context setOAuthTokenSecret:@"b6e62b4e58a1e88e"];
-#else
-
-#endif
     return self;
 }
 
+- (void)authWithKnownToken
+{
+    [self.context setOAuthToken:@"72157633799659695-18fa2dbedef388a3"];
+    [self.context setOAuthTokenSecret:@"b6e62b4e58a1e88e"];
+}
 
 - (void)authFromWeb
 {
     NSURL *url = [[NSURL alloc] initWithString:@"flickruploadr://callback"];
-    
     NSLog(@"Launching Flickr auth URL %@\n", [url absoluteString]);
-    
     [request fetchOAuthRequestTokenWithCallbackURL:url];
 }
 
@@ -60,17 +54,14 @@
     NSURL *callbackURL = [NSURL URLWithString:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
     NSLog(@"Callback URL: %@", [callbackURL absoluteString]);
     
-    BOOL result = OFExtractOAuthCallback(
-                                         callbackURL,
+    BOOL result = OFExtractOAuthCallback(callbackURL,
                                          [NSURL URLWithString:@"flickruploadr://callback"],
-                                         &requestToken,
-                                         &verifier
-                                         );
+                                         &requestToken, &verifier);
     if (!result) {
         NSLog(@"Invalid callback URL");
     } else {
         [request fetchOAuthAccessTokenWithRequestToken:requestToken verifier:verifier];
-        self.status = [self.status initWithFormat:@"Got user response..."];
+        self.status = [self.status initWithString:[[NSString alloc]initWithFormat:@"Got user response..."] ];
     }
 }
 
@@ -83,8 +74,7 @@ didObtainOAuthRequestToken:(NSString *)inRequestToken
     
     NSLog(@"Got Request token, waiting for user authorization...\n");
     NSURL *url = [self.context userAuthorizationURLWithRequestToken:inRequestToken
-                                                      requestedPermission:OFFlickrWritePermission
-                  ];
+                                                requestedPermission:OFFlickrWritePermission];
     
     BOOL result = [[NSWorkspace sharedWorkspace] openURL:url];
     
@@ -104,9 +94,9 @@ didObtainOAuthAccessToken:(NSString *)inAccessToken
     NSLog(@"Access Token: %@", inAccessToken);
     NSLog(@"Secret: %@", inSecret);
     
-    self.status = [self.status initWithFormat:@"Authorized"];
+    self.status = [self.status initWithString:[[NSString alloc] initWithFormat:@"Authorized"]];
     
-    [NSThread detachNewThreadSelector:@selector(startWorker) toTarget:self withObject:nil];
+//    [NSThread detachNewThreadSelector:@selector(startWorker) toTarget:self withObject:nil];
 }
 
 - (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest
@@ -115,23 +105,14 @@ didObtainOAuthAccessToken:(NSString *)inAccessToken
     NSLog(@"Error detected...\n");
 //    [self.statusLabel setStringValue:@"Error detected...."];
     
-    NSAttributedString * attrString = [[NSAttributedString
-                                        alloc] initWithString:[NSString stringWithFormat:@"%@\n",
-                                                               [inError localizedDescription]]
-                                       ];
-//    [[self.activity textStorage] performSelectorOnMainThread:@selector(appendAttributedString:)
+    NSAttributedString * attrString = [[NSAttributedString alloc] initWithString:
+                                       [NSString stringWithFormat:@"%@\n", [inError localizedDescription]]];
+
+    self.status = attrString;
+
+    //    [[self.activity textStorage] performSelectorOnMainThread:@selector(appendAttributedString:)
 //                                                  withObject:attrString waitUntilDone:YES];
 //    [self performSelectorOnMainThread:@selector(scrollToBottom) withObject:self waitUntilDone:YES];
-}
-
-- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest
-    imageUploadSentBytes:(NSUInteger)inSentBytes
-              totalBytes:(NSUInteger)inTotalBytes
-{
-    NSLog(@"Upload successful... inSentBytes:%lu inTotalBytes:%lu", inSentBytes, inTotalBytes);
-//    [self.waitForUploadComplete lock];
-//    [self.waitForUploadComplete signal];
-//    [self.waitForUploadComplete unlock];
 }
 
 - (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest
@@ -145,7 +126,7 @@ didObtainOAuthAccessToken:(NSString *)inAccessToken
 
 - (void)testCode
 {
-    bool result = [request ]
+//    bool result = [request ]
 }
 
 @end
